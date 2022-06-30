@@ -1,0 +1,62 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    run: speech-to-text-golang
+  name: speech-to-text-golang
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      run: speech-to-text-golang
+  strategy:
+    rollingUpdate:
+  template:
+    metadata:
+      labels:
+        run: speech-to-text-golang
+    spec:
+      hostname: speech-to-text-golang
+      containers:
+      - name: speech-to-text-golang
+        tty: true
+        image: latonaio/speech-to-text-golang:latest
+        imagePullPolicy: IfNotPresent
+        command: ["./main"]
+        env:
+        - name: GOOGLE_APPLICATION_CREDENTIALS
+          value: /app/mnt/[your-project-credentials.json]
+        - name: PULSE_SERVER
+          value: unix:/tmp/pulse/native
+        - name: PULSE_COOKIE
+          value: /tmp/pulse/cookie
+        - name: RABBITMQ_URL
+          value: amqp://guest:guest@rabbitmq:5672/s2t2s
+        - name: QUEUE_ORIGIN
+          value: get-flag-of-start-or-stop-queue
+        - name: QUEUE_TO
+          value: send-transcript-to-riva-tts-queue
+        - name: DEVICE_NUMBER
+          value: "[number]"
+        volumeMounts:
+        - mountPath: /app/mnt
+          name: current-dir
+        - mountPath: /tmp/pulse/native
+          name: pulse-socket
+        - mountPath: /tmp/pulse/cookie
+          name: pulse-cookie
+        securityContext:
+        workingDir: /app/src
+      volumes:
+      - name: current-dir
+        hostPath:
+          path: /pass/to/currentdir/
+          type: Directory
+      - name: pulse-socket
+        hostPath:
+          path: /run/user/[$uid]/pulse/native
+          type: Socket
+      - name: pulse-cookie
+        hostPath:
+          path: /home/[$user]/.config/pulse/cookie
+          type: File
