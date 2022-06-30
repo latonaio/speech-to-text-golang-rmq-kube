@@ -1,5 +1,5 @@
 # speech-to-text-golang-rmq-kube
-speech-to-text-golang-rmq-kubeは、Google Cloud Speech-to-Text APIをKubernetes上、Golangランタイムで動かすための手順概要です。  
+speech-to-text-golang-rmq-kubeは、Google Cloud Speech-to-Text APIをKubernetes上、Golangランタイムで動かすためのマイクロサービスです。  
 音声を変換したテキストは、RabbitMQに送信されます。
 
 ## 動作環境
